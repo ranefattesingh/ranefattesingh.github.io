@@ -1,3 +1,60 @@
-baseURL = 'https://example.org/'
-languageCode = 'en-us'
-title = 'My New Hugo Site'
+baseURL = "http://example.org/"
+languageCode = "en-us"
+title = "I'm Fattesingh Rane"
+theme = "ink-free"
+paginate = 5
+
+copyright = "© Copyright Since 2023<br>All Rights Reserved. Powered by <b>Fattesingh Rane</b>"
+
+[permalinks]
+  posts = "/:year/:month/:title"
+
+[params]
+	subtitle = "Welcome to my personal blogging page on engineering and technology."
+
+    avatar = "https://avatars.githubusercontent.com/u/41385129?s=400&u=32737b9a7662da275da468f1352259a439a10106&v=4"
+
+    featherIconsCDN = false
+
+    mode = "auto"
+
+    maxTags = 7
+	wpm = 250
+
+    github = "https://github.com/ranefattesingh/ranefattesingh.github.io"
+
+# Nav.
+[[menu.main]]
+name = "Home"
+url = "/"
+weight = 1
+
+[[menu.main]]
+name = "All posts"
+url = "/posts"
+weight = 2
+
+[[menu.main]]
+name = "About"
+url = "/about"
+weight = 3
+
+[[menu.main]]
+name = "Tags & Stats"
+url = "/tags"
+weight = 4
+
+[[params.social]]
+name = "Github"
+icon = "github"
+url = "https://github.com/ranefattesingh"
+
+[[params.social]]
+name = "LinkedIn"
+icon = "linkedin"
+url = "https://www.linkedin.com/in/ranefattesingh"
+
+[[params.social]]
+name = "Twitter"
+icon = "twitter"
+url = "https://twitter.com/rane_fattesingh"
