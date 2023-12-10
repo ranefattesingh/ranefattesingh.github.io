@@ -18,7 +18,7 @@ I am Fattesingh Rane, my friends call me Sahil. I'm a Software Engineer (Since 2
 
 
 
-🤩 Apart from work stuff, I love to travel, watch movies, anime and & play PC Games like **CS:Go**.
+🤩 Apart from work stuff, I love to travel, watch movies, anime and & play PC Games like **CS:Go**. Currently playing **BioShock** in story mode.
 
 ---
 📡 [GitHub](https://github.com/ranefattesingh) | [LinkedIn](https://www.linkedin.com/in/ranefattesingh/) | [E-mail](mailto:ranefattesingh@gmail.com)
