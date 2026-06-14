@@ -40,9 +40,9 @@ params:
     imageTitle: my image
     buttons:
       - name: Blogs
-        url: /mysite/posts
+        url: /posts
       - name: Projects
-        url: /mysite/projects
+        url: /projects
 
   homeInfoParams:
     Title: "Hello there \U0001F44B"
@@ -60,13 +60,13 @@ params:
   main:
     - identifier: posts
       name: Posts
-      url: /mysite/posts/
+      url: /posts/
       weight: 10
     - identifier: projects
       name: Projects
-      url: /mysite/projects/
+      url: /projects/
       weight: 20
     - identifier: about
       name: About
-      url: /mysite/about/
+      url: /about/
       weight: 30
