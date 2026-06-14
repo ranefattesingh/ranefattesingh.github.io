@@ -1,0 +1,72 @@
+baseURL: "https://ranefattesingh.github.io/"
+languageCode: "en-us"
+title: "Fattesingh Rane"
+theme: "PaperMod"
+paginate: 5
+
+enableRobotsTXT: true
+
+params:
+  env: dev 
+  title: Fattesingh Rane
+  description: "Documenting my journey through backend engineering, distributed systems, system design, and AI."
+  keywords: [Backend Engineering, Golang, Distributed Systems, System Design, AI, Kubernetes, Software Architecture]
+  author: Fattesingh Rane
+  images: ["<link or path of image for opengraph, twitter-cards>"]
+  DateFormat: "January 2, 2006"
+  defaultTheme: auto # dark, light
+  disableThemeToggle: false
+
+  ShowReadingTime: true
+  ShowShareButtons: true
+  ShowPostNavLinks: true
+  ShowBreadCrumbs: true
+  ShowCodeCopyButtons: true
+  ShowRssButtonInSectionTermList: true
+
+  label:
+    text: "Fattesingh Rane"
+    # icon: /apple-touch-icon.png
+    # iconHeight: 35
+
+    # profile-mode
+  profileMode:
+    enabled: true # needs to be explicitly set
+    title: Fattesingh Rane
+    subtitle: "Backend Engineer • Distributed Systems • AI • Continuous Learning"
+    # imageUrl: "<img location>"
+    imageWidth: 150 
+    imageHeight: 150
+    imageTitle: my image
+    buttons:
+      - name: Blogs
+        url: /posts
+      - name: Projects
+        url: /projects
+
+  homeInfoParams:
+    Title: "Hello there \U0001F44B"
+    Content: Welcome to my personal blogs
+
+  socialIcons:
+    - name: github
+      url: "https://github.com/ranefattesingh"
+    - name: linkedin
+      url: "https://linkedin.com/in/ranefattesingh"
+    - name: email
+      url: "mailto:ranefattesingh@hotmail.com"
+
+  menu:
+  main:
+    - identifier: posts
+      name: Posts
+      url: /posts/
+      weight: 10
+    - identifier: projects
+      name: Projects
+      url: /projects/
+      weight: 20
+    - identifier: about
+      name: About
+      url: /about/
+      weight: 30
