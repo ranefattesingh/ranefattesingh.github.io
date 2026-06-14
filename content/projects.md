@@ -6,6 +6,4 @@ ShowPostNavLinks: false
 ShowBreadCrumbs: true
 ---
 
-# Projects
-
 Coming soon...
