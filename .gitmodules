@@ -1,3 +1,12 @@
 [submodule "themes/hugo-profile"]
 	path = themes/hugo-profile
 	url = https://github.com/gurusabarish/hugo-profile.git
+[submodule "themes/ink-free"]
+	path = themes/ink-free
+	url = https://github.com/chollinger93/ink-free
+[submodule "ink-free"]
+	path = ink-free
+	url = https://github.com/chollinger93/ink-free
+[submodule "themes/PaperMod"]
+	path = themes/PaperMod
+	url = https://github.com/adityatelange/hugo-PaperMod.git
