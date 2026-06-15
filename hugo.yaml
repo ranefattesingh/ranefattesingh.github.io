@@ -7,7 +7,7 @@ paginate: 5
 enableRobotsTXT: true
 
 params:
-  env: dev 
+  env: production 
   title: Fattesingh Rane
   description: "Documenting my journey through backend engineering, distributed systems, system design, and AI."
   keywords: [Backend Engineering, Golang, Distributed Systems, System Design, AI, Kubernetes, Software Architecture]
@@ -34,7 +34,7 @@ params:
     enabled: true # needs to be explicitly set
     title: Fattesingh Rane
     subtitle: "Backend Engineer • Distributed Systems • AI • Continuous Learning"
-    # imageUrl: "<img location>"
+    imageUrl: "https://github.com/ranefattesingh.png"
     imageWidth: 150 
     imageHeight: 150
     imageTitle: my image
@@ -56,17 +56,21 @@ params:
     - name: email
       url: "mailto:ranefattesingh@hotmail.com"
 
-  menu:
+menu:
   main:
+    - identifier: home
+      name: Home
+      url: /
+      weight: 10
     - identifier: posts
       name: Posts
       url: /posts/
-      weight: 10
+      weight: 20
     - identifier: projects
       name: Projects
       url: /projects/
-      weight: 20
+      weight: 30
     - identifier: about
       name: About
       url: /about/
-      weight: 30
+      weight: 40
