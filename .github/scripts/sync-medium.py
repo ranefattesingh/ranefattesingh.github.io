@@ -2,17 +2,23 @@ import os
 import re
 import html
 import hashlib
+import json
 import urllib.request
 import xml.etree.ElementTree as ET
-from datetime import datetime
+from datetime import datetime, timezone
+from pathlib import Path
 from email.utils import parsedate_to_datetime
 
-MEDIUM_USERNAME = os.environ["MEDIUM_USERNAME"].strip().lstrip("@")
-OUTPUT_DIR = "content/posts"
+MEDIUM_USERNAME = os.environ.get("MEDIUM_USERNAME", "").strip().lstrip("@")
+if not MEDIUM_USERNAME:
+    raise RuntimeError("MEDIUM_USERNAME is required")
+
+REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
+OUTPUT_DIR = REPOSITORY_ROOT / "content" / "posts"
 
 FEED_URL = f"https://medium.com/feed/@{MEDIUM_USERNAME}"
 
-os.makedirs(OUTPUT_DIR, exist_ok=True)
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 print("=" * 60)
 print(f"Medium username: {MEDIUM_USERNAME}")
@@ -75,19 +81,25 @@ for item in items:
     if not slug:
         slug = hashlib.md5(link.encode()).hexdigest()[:12]
 
-    filename = os.path.join(
-        OUTPUT_DIR,
-        f"{slug}.md"
-    )
+    filename = OUTPUT_DIR / f"{slug}.md"
+
+    if filename.exists():
+        existing_content = filename.read_text(encoding="utf-8")
+        existing_link = re.search(
+            r'^externalUrl:\s*["\']?([^"\'\n]+)',
+            existing_content,
+            re.MULTILINE,
+        )
+        if existing_link and existing_link.group(1).strip() != link:
+            slug = f"{slug}-{hashlib.md5(link.encode()).hexdigest()[:8]}"
+            filename = OUTPUT_DIR / f"{slug}.md"
 
     try:
         date = parsedate_to_datetime(
             pub_date
         ).strftime("%Y-%m-%dT%H:%M:%S%z")
     except Exception:
-        date = datetime.utcnow().strftime(
-            "%Y-%m-%dT%H:%M:%S+00:00"
-        )
+        date = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S+00:00")
 
     description_text = re.sub(
         r"<[^>]+>",
@@ -105,22 +117,12 @@ for item in items:
         description_text
     ).strip()
 
-    safe_title = title.replace(
-        '"',
-        '\\"'
-    )
-
-    safe_description = description_text.replace(
-        '"',
-        '\\"'
-    )
-
     content = f"""---
-title: "{safe_title}"
+title: {json.dumps(title, ensure_ascii=False)}
 date: {date}
-description: "{safe_description}"
+description: {json.dumps(description_text, ensure_ascii=False)}
 draft: false
-externalUrl: "{link}"
+externalUrl: {json.dumps(link, ensure_ascii=False)}
 ShowReadingTime: false
 ShowShareButtons: false
 ---
