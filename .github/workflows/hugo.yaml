@@ -4,6 +4,11 @@ on:
     branches:
       - main
   workflow_dispatch:
+  workflow_run:
+    workflows:
+      - Sync Medium Posts
+    types:
+      - completed
 permissions:
   contents: read
   pages: write
@@ -16,6 +21,7 @@ defaults:
     shell: bash
 jobs:
   build:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     env:
       DART_SASS_VERSION: 1.100.0
