@@ -27,7 +27,7 @@ jobs:
         env:
           MEDIUM_USERNAME: ${{ secrets.MEDIUM_USERNAME }}
         run: |
-          python scripts/sync-medium.py
+          python .github/scripts/sync-medium.py
 
       - name: Commit changes
         run: |

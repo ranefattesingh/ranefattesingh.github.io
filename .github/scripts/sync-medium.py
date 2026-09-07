@@ -2,79 +2,146 @@ import os
 import re
 import html
 import hashlib
+import json
 import urllib.request
 import xml.etree.ElementTree as ET
-from datetime import datetime
+from datetime import datetime, timezone
+from pathlib import Path
 from email.utils import parsedate_to_datetime
 
-MEDIUM_USERNAME = os.environ["MEDIUM_USERNAME"]
-OUTPUT_DIR = "content/posts"
+MEDIUM_USERNAME = os.environ.get("MEDIUM_USERNAME", "").strip().lstrip("@")
+if not MEDIUM_USERNAME:
+    raise RuntimeError("MEDIUM_USERNAME is required")
+
+REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
+OUTPUT_DIR = REPOSITORY_ROOT / "content" / "posts"
 
 FEED_URL = f"https://medium.com/feed/@{MEDIUM_USERNAME}"
 
-os.makedirs(OUTPUT_DIR, exist_ok=True)
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-# Medium RSS namespaces
-NS = {
-    "content": "http://purl.org/rss/1.0/modules/content/",
-    "dc": "http://purl.org/dc/elements/1.1/",
-}
+print("=" * 60)
+print(f"Medium username: {MEDIUM_USERNAME}")
+print(f"Feed URL: {FEED_URL}")
+print("=" * 60)
 
-print(f"Fetching {FEED_URL}")
+# Use a browser-like User-Agent
+request = urllib.request.Request(
+    FEED_URL,
+    headers={
+        "User-Agent": "Mozilla/5.0 (compatible; HugoMediumSync/1.0)"
+    }
+)
 
-with urllib.request.urlopen(FEED_URL) as response:
-    data = response.read()
+try:
+    with urllib.request.urlopen(request, timeout=30) as response:
+        data = response.read()
 
-root = ET.fromstring(data)
+    print(f"Downloaded {len(data)} bytes")
 
-for item in root.findall("./channel/item"):
+except Exception as e:
+    print(f"ERROR fetching Medium RSS feed:")
+    print(e)
+    raise
+
+# Show beginning of response for diagnostics
+print("Response begins with:")
+print(data[:200])
+
+try:
+    root = ET.fromstring(data)
+except ET.ParseError as e:
+    print("ERROR: Medium response is not valid XML/RSS.")
+    print(e)
+    raise
+
+items = root.findall("./channel/item")
+
+print(f"Found {len(items)} Medium posts")
+
+if not items:
+    print("WARNING: RSS feed contains no posts.")
+
+for item in items:
     title = item.findtext("title", "").strip()
     link = item.findtext("link", "").strip()
     pub_date = item.findtext("pubDate", "").strip()
     description = item.findtext("description", "").strip()
 
     if not title or not link:
+        print("Skipping item without title or link")
         continue
 
-    # Create a stable filename from the Medium URL
-    slug = re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")
+    slug = re.sub(
+        r"[^a-z0-9]+",
+        "-",
+        title.lower()
+    ).strip("-")
 
     if not slug:
         slug = hashlib.md5(link.encode()).hexdigest()[:12]
 
-    filename = os.path.join(OUTPUT_DIR, f"{slug}.md")
+    filename = OUTPUT_DIR / f"{slug}.md"
 
-    # Parse date
+    if filename.exists():
+        existing_content = filename.read_text(encoding="utf-8")
+        existing_link = re.search(
+            r'^externalUrl:\s*["\']?([^"\'\n]+)',
+            existing_content,
+            re.MULTILINE,
+        )
+        if existing_link and existing_link.group(1).strip() != link:
+            slug = f"{slug}-{hashlib.md5(link.encode()).hexdigest()[:8]}"
+            filename = OUTPUT_DIR / f"{slug}.md"
+
     try:
-        date = parsedate_to_datetime(pub_date).strftime("%Y-%m-%dT%H:%M:%S%z")
+        date = parsedate_to_datetime(
+            pub_date
+        ).strftime("%Y-%m-%dT%H:%M:%S%z")
     except Exception:
-        date = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S+00:00")
+        date = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S+00:00")
 
-    # Strip HTML from description
-    description_text = re.sub("<[^>]+>", "", description)
-    description_text = html.unescape(description_text)
-    description_text = re.sub(r"\s+", " ", description_text).strip()
+    description_text = re.sub(
+        r"<[^>]+>",
+        "",
+        description
+    )
 
-    # Escape YAML
-    safe_title = title.replace('"', '\\"')
-    safe_description = description_text.replace('"', '\\"')
+    description_text = html.unescape(
+        description_text
+    )
+
+    description_text = re.sub(
+        r"\s+",
+        " ",
+        description_text
+    ).strip()
 
     content = f"""---
-title: "{safe_title}"
+title: {json.dumps(title, ensure_ascii=False)}
 date: {date}
-description: "{safe_description}"
+description: {json.dumps(description_text, ensure_ascii=False)}
 draft: false
-externalUrl: "{link}"
+externalUrl: {json.dumps(link, ensure_ascii=False)}
 ShowReadingTime: false
 ShowShareButtons: false
 ---
 
-This article was originally published on [Medium]({link}).
+This article was originally published on Medium.
 
 **[Read the full article on Medium →]({link})**
 """
 
-    with open(filename, "w", encoding="utf-8") as f:
+    with open(
+        filename,
+        "w",
+        encoding="utf-8"
+    ) as f:
         f.write(content)
 
     print(f"Synced: {title}")
+    print(f"  -> {filename}")
+
+print("=" * 60)
+print("Medium sync complete.")
+print("=" * 60)
